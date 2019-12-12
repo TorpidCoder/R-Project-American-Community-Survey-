@@ -77,14 +77,22 @@ library(skimr)
 options(scipen=10000)
 
 start_time <- Sys.time()
+
+# selecting the column on which I have to work upon
 cols <- c("ST", "VALP","LAPTOP","HISPEED","FULP","GASP","TYPE","TAXP","WIF","HINCP","GRNTP","RNTP","FINCP","RMSP","NP","ADJINC","ACR","INSP","FTAXP","FHINCP","FINSP","YBL","MV","HHL","VEH")
+
+# using the fread method of the data.table package to read the huge data in less time.
 mainData <- fread("MainData.csv",select = cols)
 end_time <- Sys.time()
+
+# calculating the time of reading here
 end_time - start_time
 
 
-
+# getting the fancy summary of data using pander package
 pander(summary(mainData))
+
+# getting the summary plus histogram of data using the skim package
 skim(mainData)
 
 ```
@@ -1290,4 +1298,761 @@ I belive that the models I fit and used are the right models to work upon but in
 
 I have around 80%-85% confidence and sure about the conclusion I have constructed. Also there is always a room of Improvement everywhere. The conclusion I have constructed is completely helpful for Policy Simulation and Creation in a Country.
 I completely believe in the effort I have put on and also believes that this is quite helpful for a viewer. I am confident about my outputs and results here. Although I need work more upon the data plotting part.
+
+
+
+## 5. Overall Code and Appendix
+
+**Code-1 : Reading the data here inside this chunk**
+
+```{r eval=FALSE}
+# reading the data set only
+
+library(data.table)
+library(pander)
+library(kableExtra)
+library(skimr)
+
+
+# start_time <- Sys.time()
+# mainData <- fread("MainData.csv")
+# end_time <- Sys.time()
+
+
+#end_time - start_time
+options(scipen=10000)
+
+start_time <- Sys.time()
+
+# selecting the column on which I have to work upon
+cols <- c("ST", "VALP","LAPTOP","HISPEED","FULP","GASP","TYPE","TAXP","WIF","HINCP","GRNTP","RNTP","FINCP","RMSP","NP","ADJINC","ACR","INSP","FTAXP","FHINCP","FINSP","YBL","MV","HHL","VEH")
+
+# using the fread method of the data.table package to read the huge data in less time.
+mainData <- fread("MainData.csv",select = cols)
+end_time <- Sys.time()
+
+# calculating the time of reading here
+end_time - start_time
+
+
+# getting the fancy summary of data using pander package
+pander(summary(mainData))
+
+# getting the summary plus histogram of data using the skim package
+skim(mainData)
+```
+
+
+**Code-2 : Getting the insight of data here**
+
+```{r eval=FALSE}
+library(kableExtra)
+library(dplyr)
+library(magrittr)
+library(DT)
+options(DT.options = list(pageLength = 30))
+
+
+top10.mainData <- mainData[1:10]
+top10.mainData %>%
+    datatable(options = list(dom = "t", ordering = FALSE), 
+              rownames = FALSE,
+              width = 30) %>%
+    formatStyle(c("ST", "VALP","LAPTOP","HISPEED","FULP","GASP","TYPE","TAXP","WIF","HINCP","GRNTP","RNTP","FINCP","RMSP","NP","ADJINC","ACR","INSP","FTAXP","FHINCP","FINSP","YBL","MV","HHL","VEH"), backgroundColor = styleEqual(NA, "skyblue"))
+```
+
+**Code-3 : Checking the unwanted and null values present in the data**
+
+```{r eval=FALSE}
+library(dplyr)
+library(tidyverse)
+library(ggdark)
+library(ggplot2)
+
+
+
+missing.values <- mainData %>%
+    gather(key = "key", value = "val") %>%
+    mutate(is.missing = is.na(val)) %>%
+    group_by(key, is.missing) %>%
+    summarise(num.missing = n()) %>%
+    filter(is.missing==T) %>%
+    select(-is.missing) 
+
+missing.values$id <- seq(1,21)
+
+
+label_data <- missing.values
+number_of_bar <- nrow(label_data)
+angle <-  90 - 360 * (label_data$id) /number_of_bar
+label_data$hjust<-ifelse( angle < -90, 1, 0)
+label_data$angle<-ifelse(angle < -90, angle+180, angle)
+
+ggplot(missing.values, aes(x=as.factor(id), y=num.missing)) +       # Note that id is a factor. If x is numeric, there is some space between the first bar
+  
+  # This add the bars with a blue color
+  geom_bar(stat="identity", fill=alpha("yellow", 1)) +
+  
+  # Limits of the plot = very important. The negative value controls the size of the inner circle, the positive one is useful to add size over each bar
+  ylim(-1,120) +
+  
+  # Custom the theme: no axis title and no cartesian grid
+  theme_minimal() +
+  theme(
+    axis.text = element_blank(),
+    axis.title = element_blank(),
+    panel.grid = element_blank(),
+    plot.margin = unit(rep(-1,4), "cm")      # Adjust the margin to make in sort labels are not truncated!
+  ) +
+  
+  # This makes the coordinate polar instead of cartesian.
+  coord_polar(start = 0) +
+  
+  # Add the labels, using the label_data dataframe that we have created before
+  geom_text(data=label_data, aes(x=id, y=num.missing+10, label=key, hjust=hjust), color="White", fontface="bold",alpha=0.6, size=2.5, angle= label_data$angle, inherit.aes = FALSE ) + scale_y_continuous(limits=c(0,100) + scale_x_continuous(limits=c(0,100))) + dark_theme_void() + labs(title = "Circular Bar Plot of missing values")
+```
+
+**Code-4 : Calculating the Null values and creating the insight**
+
+```{r eval=FALSE}
+library(dplyr)
+library(ggplot2)
+library(plotly)
+library(tidyverse)
+library(ggdark)
+
+
+missing.values.percentage <- mainData %>%
+  gather(key = "key", value = "val") %>%
+  mutate(isna = is.na(val)) %>%
+  group_by(key) %>%
+  mutate(total = n()) %>%
+  group_by(key, total, isna) %>%
+  summarise(num.isna = n()) %>%
+  mutate(pct = num.isna / total * 100)
+
+
+
+
+levels <-
+    (missing.values.percentage  %>% filter(isna == T) %>% arrange(desc(pct)))$key
+
+percentage.plot <- missing.values.percentage %>%
+      ggplot() +
+        geom_bar(aes(x = reorder(key, desc(pct)), 
+                     y = pct, fill=isna , width=.8), 
+                 stat = 'identity', alpha=0.35 , position = position_dodge() , colour="black") +
+      scale_x_discrete(limits = levels) +
+      scale_fill_manual(name = "", 
+                        values = c('purple3', 'gold1'), labels = c("Present", "Missing")) +
+      coord_flip() +
+      labs(title = "Percentage of missing values", x =
+             'Variable', y = "% of missing values")
+
+
+percentage.ploting <- ggplotly(percentage.plot)
+percentage.ploting
+```
+
+
+**Code-5 : Calculating and plotting the average property value in USA by states**
+
+```{r eval=FALSE}
+library(dplyr)
+library(ggplot2)
+library(ggdark)
+
+valuebystate <- mainData %>% select(ST , VALP)
+plotdata <- valuebystate %>% group_by(ST) %>% filter(!any(is.na(ST))) %>% summarise(Avg_Value = mean(VALP,na.rm = TRUE))
+
+statewise.landValue <- valuebystate %>% group_by(ST) %>% filter(!any(is.na(ST))) %>% summarise(Avg_Value = mean(VALP,na.rm = TRUE))
+statewise.landValue
+tb <- (plotdata$ST)
+tbNorm <- (plotdata$Avg_Value)
+
+require ("ggplot2")
+require ("choroplethr")
+require ("choroplethrMaps")
+
+
+states <- data.frame ( c (1, 2, 4, 5, 6, 8, 9, 10, 11, 12, 13, 15, 16, 17, 18, 19, 20,
+21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35,
+36, 37, 38, 39, 40, 41, 42, 44, 45, 46, 47, 48, 49, 50, 51,
+53, 54, 55, 56, 72),
+    c("Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut",
+    "Delaware", "District of Columbia", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois",
+    "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts",
+    "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada",
+    "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota",
+    "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island",
+    "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia",
+    "Washington", "West Virginia", "Wisconsin", "Wyoming", "Puerto Rico"))
+    
+names (states) = c ("Index", "State")
+
+# takes a table across states as input and prints it on a map
+# uses the "choroplethr" package
+plot.map <- function (tb, title = "", legend = "") {
+ 
+  i <- match (names (tb), as.character(states$Index))
+  states <- data.frame (tb, tolower(states$State[i]))
+  states <- states [,c (3,2)]
+  
+  # this is required by choroplethr
+  names (states) <- c ("region", "value")
+  states$region <- as.character (states$region)
+  
+  # this is identical to state_choroplethr except that the labels are being removed
+  c = StateChoropleth$new(states)
+  c$set_num_colors(7)
+  c$title  = title
+  c$legend = legend
+  c$set_zoom(NULL)
+  c$show_labels = FALSE
+  c$render()
+}
+
+avg.val.data <- (statewise.landValue$Avg_Value)
+state.data <- (plotdata$ST)
+avg.data <- state.data / avg.val.data
+geographical.rep.table <- as.table(setNames(tbNorm,tb))
+plot.map (geographical.rep.table, "Average Property Value By States in US", "Cluster of Land Value") + theme(plot.title = element_text(hjust = 0.5)) + dark_theme_linedraw() + theme(legend.background = element_rect(fill="black",
+                                  size=0.5, linetype="solid", 
+                                  colour ="white"))
+```
+
+
+**Code-6 : Calculating and plotting the Laptop users with High speed interent availablity**
+
+```{r eval=FALSE}
+user.laptop.hispeed <- mainData %>% filter(LAPTOP != 'b' , LAPTOP ==1 , HISPEED !='NA' ) %>% select(LAPTOP , HISPEED)
+user.laptop.hispeed.pie <- user.laptop.hispeed %>% group_by(LAPTOP,HISPEED) %>% summarise(COUNT = n()) %>% mutate(lab.ypos = cumsum(COUNT) - 0.5*COUNT)
+user.laptop.hispeed.pie$HISPEED <- factor(user.laptop.hispeed.pie$HISPEED , labels = c("Yes" , "No"))
+
+
+ggplot(user.laptop.hispeed.pie, aes(x = "", y = COUNT , fill = HISPEED)) +
+  geom_bar(width = 1, stat = "identity", color = "black") +
+  coord_polar("y", start = 0) + 
+  theme_void() + geom_text(aes(label = paste0(COUNT, " (", scales::percent(COUNT / sum(COUNT)),")")),
+position = position_stack(vjust = 0.8) , check_overlap = T , size = 3.5) + labs(title = "Desktop Users With HighSpeed Internet Service" , fill = "Hispeed Connectivity") + theme(legend.text = element_text(face = "italic", colour="steelblue4",family = "Helvetica"),legend.title = element_text(colour = "steelblue",  face = "bold.italic", family = "Helvetica")) + theme(
+  legend.box.background = element_rect(),
+  legend.box.margin = margin(6, 6, 6, 6)
+)
+```
+
+
+**Code-7 : Calculating and plotting the natural resources consumption in united states**
+
+```{r eval=FALSE}
+library(tidyverse)
+
+# Natural Resources Consumption by States
+FuelCost <- mainData %>% select(ST , FULP , GASP) %>% filter(FULP > 2 , GASP >2)
+FuelCostPlot <- FuelCost %>% group_by(ST) %>% summarise(Avg_Fuel_Usage = mean(FULP , na.rm = TRUE) , Avg_Gas_Usage = mean(GASP , na.rm = TRUE))
+
+
+FuelCostPlot$ST <- factor(FuelCostPlot$ST)
+levels(FuelCostPlot$ST) <- c("Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut",
+    "Delaware", "District of Columbia", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois",
+    "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts",
+    "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada",
+    "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota",
+    "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island",
+    "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia",
+    "Washington", "West Virginia", "Wisconsin", "Wyoming", "Puerto Rico")
+
+state.wise.consumption.data <- FuelCostPlot %>%
+  gather("Stat", "Value", -ST)
+
+ggplot(state.wise.consumption.data, aes(x = ST, y = Value, fill = Stat)) +
+  geom_col(position = "dodge") + coord_flip() +scale_fill_manual(values=c("#D823DE", "#23DEA0"))  + theme(legend.box.background = element_rect(),legend.box.margin = margin(6, 6, 6, 6)) + labs(title = "Natural Resources Consumption by States") + theme(axis.title.x = element_blank(),axis.text.y=element_text(size=rel(0.8))) + dark_theme_linedraw() + xlab("State Names") +ylab("Consumption Values") + theme(legend.background = element_rect(fill="black",
+                                  size=0.5, linetype="solid", 
+                                  colour ="white"))
+```
+
+
+**Code-8 : Calculating and plotting the average house tax by states in the United States**
+
+```{r eval=FALSE}
+library(mapproj)
+library(ggplot2)
+library(ggdark)
+
+
+states_data_map <- map_data("state")
+
+Houses.only <- mainData %>% filter(TYPE == 1 , FTAXP == 1) %>% select(ST , TAXP)
+
+
+avg.tax <- Houses.only %>% group_by(ST) %>% summarise(avg.mean.tax = mean(TAXP , na.rm = T))
+
+ST<-c(1,2,4,5,6,8,9,10,11,12,13,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,44,45,46,47,48,49,50,51,53,54,55,56,72)
+region<-c('alabama','alaska','arizona','arkansas','california','colorado','connecticut','delaware','district of columbia','florida','georgia','hawaii','idaho','illinois','indiana','iowa','kansas','kentucky','louisiana','maine','maryland','massachusetts','michigan','minnesota','mississippi','missouri','montana','nebraska','nevada','new hampshire','new jersey','new mexico','new york','north carolina','north dakota','ohio','oklahoma','oregon','pennsylvania','rhode island','south carolina','south dakota','tennessee','texas','utah','vermont','virginia','washington','west virginia','wisconsin','wyoming','puerto rico')
+
+states.data <- data.frame(ST,region)
+
+states.data$ST <- as.factor(as.character(states.data$ST))
+avg.tax$ST <- as.factor(as.character(avg.tax$ST))
+
+common.data <-   merge(avg.tax,states.data,by="ST")
+mapcreation  <-  merge(states_data_map, common.data, by="region")
+
+centroids <- data.frame(region=tolower(state.name), long=state.center$x, lat=state.center$y)
+centroids$abb<-state.abb[match(centroids$region,tolower(state.name))]
+
+
+ggplot(mapcreation, aes(x = long, y = lat, group = group, fill = avg.mean.tax)) + 
+coord_map("gilbert") +
+theme_light() +
+scale_fill_continuous(low="Green",high="red",limits=c(min(mapcreation$avg.mean.tax), max(mapcreation$avg.mean.tax))) +
+labs(title = "Average House Tax (Property) Figures - By States",fill="Average\nProperty Tax\n Costs($)") + geom_polygon(colour = "black") + theme(strip.background = element_blank(), strip.text.x = element_blank(), axis.text.x = element_blank(), axis.text.y = element_blank(), axis.ticks  = element_blank(), axis.line   = element_blank(), panel.border= element_blank(), panel.grid  = element_blank(), legend.position = "right") + xlab("") + ylab("") + with(centroids,  ggplot2::annotate(geom="text", x = long, y=lat, label = abb, 
+size = 3,color="black",family="Times")) + theme(legend.box.background = element_rect(),legend.box.margin = margin(6, 6, 6, 6)) + theme(plot.title = element_text(hjust = 0.5)) + theme(plot.title = element_text(hjust = 0.5)) + dark_theme_linedraw() + theme(legend.background = element_rect(fill="black",
+                                  size=0.5, linetype="solid", 
+                                  colour ="white"))
+```
+
+
+**Code-9 : Checking and plotting the Economic entities in the United States**
+
+```{r eval=FALSE}
+# Coorelation between all economic aspect columns which proves the basic income and expenditure in a household.
+require(ggpubr)
+require(tidyverse)
+require(Hmisc)
+require(corrplot)
+library(ellipse)
+library(RColorBrewer)
+corr.components <- mainData %>% select(WIF , HINCP , GRNTP , RNTP , FINCP )
+corr.components <- na.omit(corr.components)
+
+
+round(cor(corr.components), 2)
+rcorr(as.matrix(corr.components))
+
+M<-cor(corr.components)
+corrplot(M, method = "ellipse",col=brewer.pal(n=8, name="PuOr"))
+corrplot(M, method = "number",col=brewer.pal(n=8, name="PuOr"))
+```
+
+
+**Code-10 : Predict the Value of the House by the Number of Rooms Available**
+
+```{r eval=FALSE}
+library(moments)
+library(dplyr)
+library(ggplot2)
+library(knitr)
+library(kableExtra)
+library(broom)
+library(ggdark)
+
+
+# Extracting the valueable columns
+predict.data <- mainData %>% filter(RMSP != 'NA' , VALP != 'NA' ) %>% select(RMSP , VALP)
+predict.data <- na.omit(predict.data)
+
+# testing the variance of dataset
+var.test(predict.data$RMSP,predict.data$VALP)
+
+
+# checking the correlation between the variables after the filtering.
+cor(predict.data$VALP , predict.data$RMSP)
+
+
+# Checking the normality
+
+#checking the skewness of RMSP column
+skewness(predict.data$RMSP)
+
+#checking the skewness of VALP column
+skewness(predict.data$VALP)
+
+ggplot(predict.data, aes(x=RMSP)) + 
+ geom_histogram(aes(y=..density..), colour="darkblue", fill="lightblue")+
+ geom_density(alpha=.2, fill="#FF6666" , color = 'black') + labs(title="Histogram for Room Number") +
+  labs(x="Number of Rooms", y="Desnity Values") + theme(plot.title = element_text(hjust = 0.5))  + geom_vline(aes(xintercept=mean(RMSP)),
+            color="blue", linetype="dashed", size=1)
+
+
+ggplot(predict.data, aes(x=VALP)) + 
+ geom_histogram(aes(y=..density..), colour="darkblue", fill="red")+
+ geom_density(alpha=.2, fill="#FF6666",color = 'black') + labs(title="Histogram for Value of House") +
+  labs(x="Value of House", y="Desnity Values") + theme(plot.title = element_text(hjust = 0.5))  + geom_vline(aes(xintercept=mean(RMSP)),
+            color="red", linetype="dashed", size=1)
+
+# checking the relation by visualization
+ggplot(predict.data , aes(x = VALP , y = RMSP)) + geom_point(color = "black") + stat_smooth()
+
+predict.data.test <- predict.data %>% group_by(RMSP) %>% dplyr::summarise(valueofhouse = n())
+
+lm.method.predict <- lm(VALP ~ RMSP, data =
+             predict.data)
+
+lm.method.predict.test <- lm(valueofhouse ~ RMSP, data =
+             predict.data.test)
+
+
+summary(lm.method.predict.test)
+
+lm.method.predict.summary <- summary(lm.method.predict.test)
+
+kable(lm.method.predict.summary$coefficients) %>%
+  kable_styling("striped", full_width = F) %>%
+  row_spec(0:2, bold = T, color = "black", background = "skyblue")
+
+sigma(lm.method.predict)*100/mean(predict.data$VALP)
+
+qqnorm(lm.method.predict$residuals, col = "yellow")
+qqline(lm.method.predict$residuals, col = "blue")
+
+lm.method.predict.test.metrics <- augment(lm.method.predict.test)
+
+ggplot(lm.method.predict.test.metrics, aes(RMSP, valueofhouse)) +
+  geom_point() +
+  stat_smooth(method = lm, se = FALSE) +
+  geom_segment(aes(xend = RMSP, yend = .fitted), color = "red", size = 0.3) + annotate("rect", xmin=c(3.5,15), xmax=c(9.5,26), ymin=c(250000,0) , ymax=c(750000,150000), alpha=0.2, color="white", fill="blue") + dark_theme_linedraw() + annotate("text", x=11, y=820000, label= "Maximum Residual Value \n (R.S.S value very high)") + annotate("text", x=22, y=220000, label= "Minimum Residual Value \n (R.S.S value Accurate)") + xlab("Room Space") + ylab("Value of the House")
+```
+
+
+**Code-11 : Does House Income depicts the standard of Living in the United States**
+
+```{r eval=FALSE}
+require(ggpubr)
+# Correlation between the Income and the House size
+
+income.house.data <- mainData %>% select(HINCP , NP , ADJINC , ACR) %>% filter(ACR != 'NA')
+income.house.data <- na.omit(income.house.data)
+
+income.house.data$AdjustedHousehold_Inc<-income.house.data$HINCP*unique(income.house.data$ADJINC/1E06,incomparables = FALSE)
+
+# removing the outliers
+
+outliers<-boxplot(income.house.data$AdjustedHousehold_Inc,plot=F)$out
+
+# finding the corelation
+
+plot(income.house.data$ACR,income.house.data$AdjustedHousehold_Inc,col="blue")
+income.house.data.df<- income.house.data[,c("AdjustedHousehold_Inc","ACR")]
+income.house.data.df1<- income.house.data.df[complete.cases(income.house.data.df),]
+cor(income.house.data.df1$AdjustedHousehold_Inc,as.numeric(income.house.data.df1$ACR))
+
+ggscatter(income.house.data.df1, x = "AdjustedHousehold_Inc", y = "ACR",
+   add = "reg.line",
+   add.params = list(color = "blue", fill = "lightgray"),
+   conf.int = TRUE
+   ) + stat_cor(method = "pearson", label.x = 3, label.y = 30)
+```
+
+
+**Code-12 : How much Americans Care About Their Houses.**
+
+```{r eval=FALSE}
+library(ggdark)
+library(viridis)
+
+#how much americans care about their homes
+
+house.insurance.care <- mainData %>% select(TYPE , FINSP , FHINCP , HINCP , INSP , ST)
+
+
+# gettng the type of unit = 1 , Fire, hazard, flood insurance  = 1 and household income
+house.insurance.cols <-  subset(house.insurance.care,TYPE==1 & FINSP==1 & FHINCP==1) 
+house.data<- house.insurance.cols[,c('ST','INSP','HINCP')]
+
+unique.states <- unique(house.data$ST)
+
+insurance.data <- as.data.frame(tapply(house.data$INSP,house.data$ST,mean))
+colnames(insurance.data) <- c("Avg")
+dataframe.insu <- as.data.frame(cbind(ST=unique.states,Avg=insurance.data$Avg))
+dataframe.insu$flag <- c("Insurance")
+income.data = as.data.frame(tapply(house.data$HINCP,house.data$ST,mean))
+colnames(income.data) <- c("Avg")
+dataframe.inc <- as.data.frame(cbind(ST=unique.states,Avg=income.data$Avg))
+dataframe.inc$flag <-  c("Income")
+dataframe.insu$ST=as.factor(as.character(dataframe.insu$ST))
+dataframe.inc$ST=as.factor(as.character(dataframe.inc$ST))
+
+insurance.house.df <- rbind(dataframe.insu,dataframe.inc)
+ST<-c(1,2,4,5,6,8,9,10,11,12,13,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,44,45,46,47,48,49,50,51,53,54,55,56,72)
+region<-c('alabama','alaska','arizona','arkansas','california','colorado','connecticut','delaware','district of columbia','florida','georgia','hawaii','idaho','illinois','indiana','iowa','kansas','kentucky','louisiana','maine','maryland','massachusetts','michigan','minnesota','mississippi','missouri','montana','nebraska','nevada','new hampshire','new jersey','new mexico','new york','north carolina','north dakota','ohio','oklahoma','oregon','pennsylvania','rhode island','south carolina','south dakota','tennessee','texas','utah','vermont','virginia','washington','west virginia','wisconsin','wyoming','puerto rico')
+housing.states <- data.frame(ST,region)
+housing.states$ST <- as.factor(as.character(housing.states$ST))
+insurance.house.df$ST=as.factor(as.character(insurance.house.df$ST))
+
+all.housing.insu <- merge(insurance.house.df,housing.states,by="ST")
+all.housing.insu.top5 = subset(all.housing.insu, ST ==6 | ST == 11 | ST == 25 |ST == 36 |ST == 53 )
+
+ggplot(data=all.housing.insu, aes(x=region, y=round(Avg), fill=flag)) +
+    geom_bar(stat="identity", position=position_dodge())+ coord_flip() +
+theme(axis.title.x = element_blank(),axis.text.y=element_text(size=rel(0.8)))  + scale_fill_manual(values=c("#23DEDB", "#DEDE23")) +theme(legend.box.background = element_rect(),legend.box.margin = margin(6, 6, 6, 6)) + theme(plot.title = element_text(hjust = 0.5)) + dark_theme_linedraw() + theme(legend.background = element_rect(fill="black",
+                                  size=0.5, linetype="solid", 
+                                  colour ="white"))
+```
+
+
+**Code-13 : Value of Houses based On their Construction Year**
+
+```{r eval=FALSE}
+library(ggplot2)
+library(dplyr)
+library(ggdark)
+
+options(scipen=10000)
+
+yearbuild.propertyval <- mainData %>% select(YBL , VALP)
+yearbuild.propertyval <- na.omit(yearbuild.propertyval)
+yearbuild.propertyval$YBL <- replace(yearbuild.propertyval$YBL, yearbuild.propertyval$YBL == 01 , "1939 or earlier")
+yearbuild.propertyval$YBL <- replace(yearbuild.propertyval$YBL, yearbuild.propertyval$YBL == 02 , "1940 to 1949")
+yearbuild.propertyval$YBL <- replace(yearbuild.propertyval$YBL, yearbuild.propertyval$YBL == 03 , "1950 to 1959")
+yearbuild.propertyval$YBL <- replace(yearbuild.propertyval$YBL, yearbuild.propertyval$YBL == 04 , "1960 to 1969")
+yearbuild.propertyval$YBL <- replace(yearbuild.propertyval$YBL, yearbuild.propertyval$YBL == 05 , "1970 to 1979")
+yearbuild.propertyval$YBL <- replace(yearbuild.propertyval$YBL, yearbuild.propertyval$YBL == 06 , "1980 to 1989")
+yearbuild.propertyval$YBL <- replace(yearbuild.propertyval$YBL, yearbuild.propertyval$YBL == 07 , "1990 to 1999")
+yearbuild.propertyval$YBL <- replace(yearbuild.propertyval$YBL, yearbuild.propertyval$YBL == 08 , "2000 to 2004")
+yearbuild.propertyval$YBL <- replace(yearbuild.propertyval$YBL, yearbuild.propertyval$YBL == 09 , "2005")
+yearbuild.propertyval$YBL <- replace(yearbuild.propertyval$YBL, yearbuild.propertyval$YBL == 10 , "2006")
+yearbuild.propertyval$YBL <- replace(yearbuild.propertyval$YBL, yearbuild.propertyval$YBL == 11 , "2007")
+yearbuild.propertyval$YBL <- replace(yearbuild.propertyval$YBL, yearbuild.propertyval$YBL == 12 , "2008")
+yearbuild.propertyval$YBL <- replace(yearbuild.propertyval$YBL, yearbuild.propertyval$YBL == 13 , "2009")
+yearbuild.propertyval$YBL <- replace(yearbuild.propertyval$YBL, yearbuild.propertyval$YBL == 14 , "2010")
+yearbuild.propertyval$YBL <- replace(yearbuild.propertyval$YBL, yearbuild.propertyval$YBL == 15 , "2011")
+yearbuild.propertyval$YBL <- replace(yearbuild.propertyval$YBL, yearbuild.propertyval$YBL == 16 , "2012")
+yearbuild.propertyval$YBL <- replace(yearbuild.propertyval$YBL, yearbuild.propertyval$YBL == 17 , "2013")
+yearbuild.propertyval$YBL <- replace(yearbuild.propertyval$YBL, yearbuild.propertyval$YBL == 18 , "2014")
+yearbuild.propertyval$YBL <- replace(yearbuild.propertyval$YBL, yearbuild.propertyval$YBL == 19 , "2015")
+yearbuild.propertyval$YBL <- replace(yearbuild.propertyval$YBL, yearbuild.propertyval$YBL == 20 , "2016")
+yearbuild.propertyval$YBL <- replace(yearbuild.propertyval$YBL, yearbuild.propertyval$YBL == 21 , "2017")
+
+avg.price.yearwise <- yearbuild.propertyval %>% group_by(YBL) %>% summarise(mean.value = mean(VALP , na.rm = T))
+
+ggplot(avg.price.yearwise, aes(x=`YBL`, y=mean.value , label = "")) + 
+  geom_point(stat='identity', fill="black", size=6 , color="Red" , alpha = 0.6)  +
+  geom_segment(aes(y = 0, 
+                   x = `YBL`, 
+                   yend = mean.value, 
+                   xend = `YBL`), 
+               color = "white") +
+  geom_text(color="white", size=3) +
+  labs(title="Value of House Based on Construction Year", 
+       subtitle="Does Construction Year Matters ?") + coord_flip() + dark_theme_linedraw() + xlab("Year of Build") + ylab("Average Price of House")
+```
+
+
+**Code-14 : Linguistic Demographics versus Year of living**
+
+```{r eval=FALSE}
+library(ggplot2)
+library(dplyr)
+library(ggdark)
+
+move.data <- mainData %>% select(MV,HHL) %>% filter(MV != "NA" , HHL != "NA") %>% na.omit(move.data)
+move.data$MV <- replace(move.data$MV, move.data$MV == 1 , "12 months or less")
+move.data$MV <- replace(move.data$MV, move.data$MV == 2 , "13 to 23 months")
+move.data$MV <- replace(move.data$MV, move.data$MV == 3 , "2 to 4 years")
+move.data$MV <- replace(move.data$MV, move.data$MV == 4 , "5 to 9 years")
+move.data$MV <- replace(move.data$MV, move.data$MV == 5 , "10 to 19 years")
+move.data$MV <- replace(move.data$MV, move.data$MV == 6 , "20 to 29 years")
+move.data$MV <- replace(move.data$MV, move.data$MV == 7 , "30 years or more")
+
+
+move.data$HHL <- replace(move.data$HHL, move.data$HHL == 1 , "English only")
+move.data$HHL <- replace(move.data$HHL, move.data$HHL == 2 , "Spanish")
+move.data$HHL <- replace(move.data$HHL, move.data$HHL == 3 , "Other Indo-European languages")
+move.data$HHL <- replace(move.data$HHL, move.data$HHL == 4 , "Asian and Pacific Island languages")
+move.data$HHL <- replace(move.data$HHL, move.data$HHL == 5 , "Other language")
+
+move.data <- move.data %>% group_by(MV, HHL) %>% summarise(count.values = n())
+
+ggplot() + geom_point(data = move.data, aes(x = MV, y = count.values, size = 5, color = HHL, shape = HHL)) + coord_flip() +dark_theme_linedraw()  + xlab("Living Here Since..") + ylab("Values") + labs(title = "Migrate Period Along with Linguistic Demographics")
+```
+
+
+**Code-15 : Predicting the value of the house by family Income Using Support Vector Machine**
+
+```{r eval=FALSE}
+library(caret)
+library(dplyr)
+library(kernlab)
+
+# getting the data
+f.income.house.size <- mainData %>% select(FINCP,VALP) %>% filter(FINCP != "NA" , VALP != "NA" ) %>% na.omit(f.income.house.size)
+# selecting the minimum data because of machine limit
+f.income.house.size <- head(f.income.house.size,100)
+
+
+# partitioning the data
+intrain <- createDataPartition(y = f.income.house.size$VALP, p= 0.7, list = FALSE)
+training <- f.income.house.size[intrain,] 
+testing <- f.income.house.size[-intrain,]
+training[["VALP"]] = factor(training[["VALP"]])
+
+# anyNA() method, which checks for any null values
+anyNA(f.income.house.size)
+
+# summary of the data
+summary(f.income.house.size)
+
+# assigning the train control method here. Control all the computational overheads so that we can use the train() function provided by the caret package
+trctrl <- trainControl(method = "repeatedcv", number = 10, repeats = 3)
+
+
+# training the model usin
+svm_Linear <- train(VALP ~ FINCP, data = training, method = "svmLinear",
+trControl=trctrl,
+preProcess = c("center", "scale"),
+tuneLength = 10)
+
+# predicting the model
+svm_Linear
+
+# prediciting the respective values
+test_pred <- predict(svm_Linear, newdata = testing)
+test_pred
+```
+
+
+**Code-16 : State Wise - Number of Workers Present in a House (Dynamic Graph)**
+
+```{r eval=FALSE}
+library(dplyr)
+library(ggplot2)
+library(viridis)
+library(hrbrthemes)
+library(ggdark)
+library(plotly)
+
+
+
+state.workers.home <- mainData %>% select(ST, WIF) %>% filter(WIF != "NA") %>% na.omit(state.workers.home)
+state.workers.home <- state.workers.home %>% dplyr::group_by(ST,WIF) %>% dplyr::summarise(count = n())
+
+# Changing the section here.
+state.workers.home$WIF <- replace(state.workers.home$WIF, state.workers.home$WIF == 0 , "Zero Worker")
+state.workers.home$WIF <- replace(state.workers.home$WIF, state.workers.home$WIF == 1 , "One Worker")
+state.workers.home$WIF <- replace(state.workers.home$WIF, state.workers.home$WIF == 2 , "Two Worker")
+state.workers.home$WIF <- replace(state.workers.home$WIF, state.workers.home$WIF == 3 , "Three Worker")
+
+# Changing the state names here.
+
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 1,"alabama")
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 2,"alaska")
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 4,"arizona")
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 5,"arkansas")
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 6,"california")
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 8,"colorado")
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 9,"connecticut")
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 10,"delaware")
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 11,"district of columbia")
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 12,"florida")
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 13,"georgia")
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 15,"hawaii")
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 16,"idaho")
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 17,"illinois")
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 18,"indiana")
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 19,"iowa")
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 20,"kansas")
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 21,"kentucky")
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 22,'louisiana')
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 23,"maine")
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 24,"maryland")
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 25,'massachusetts')
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 26,'michigan')
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 27,'minnesota')
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 28,'mississippi')
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 29,'missouri')
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 30,'montana')
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 31,'nebraska')
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 32,'nevada')
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 33,'new hampshire')
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 34,'new jersey')
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 35,'new mexico')
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 36,'new york')
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 37,'north carolina')
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 38,'north dakota')
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 39,'ohio')
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 40,'oklahoma')
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 41,'oregon')
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 42,'pennsylvania')
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 44,'rhode island')
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 45,'south carolina')
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 46,'south dakota')
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 47,'tennessee')
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 48,'texas')
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 49,'utah')
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 50,'vermont')
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 51,'virginia')
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 53,'washington')
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 54,'west virginia')
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 55,'wisconsin')
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 56,'wyoming')
+state.workers.home$ST <- replace(state.workers.home$ST, state.workers.home$ST == 72,'puerto rico')
+
+
+p <- ggplot(state.workers.home, aes(fill=WIF, y=count, x=ST)) + 
+    geom_bar(position="stack", stat="identity") +
+    scale_fill_viridis(discrete = T) +
+    ggtitle("Statewise - Number of Workers Present in Home") +
+    theme_ipsum() +
+    xlab("State Names") + theme(axis.text.x = element_text(angle=90, hjust=1, size = 7))
+
+ploting <- ggplotly(p)
+ploting
+```
+
+
+**Code-17 : Finding the Relationship between Number of Workers in a House and the Vehciles they Own**
+
+```{r eval=FALSE}
+# relationship bw workers in the family and monthly rent
+
+library(dplyr)
+library(gplots)
+library(ggdark)
+
+worker.vehciles <- mainData %>% select(WIF, VEH) %>% filter(WIF != "NA" , VEH != 'NA') %>% na.omit(worker.vehciles)
+tbltest <- table(worker.vehciles$WIF,worker.vehciles$VEH)
+
+# performing the chi square test 
+chisq.test(tbltest)
+
+balloonplot(t(tbltest), main ="Workers in House - Vehciles They Own", xlab ="Vehicles", ylab="No of Workers",
+            label = FALSE, show.margins = FALSE)
+
+#create density curve
+curve(dchisq(x, df = 18), from = 0, to = 40,
+main = 'Chi-Square Distribution (df = 18)',
+ylab = 'Density',
+lwd = 2)
+```
+
+
+**Code-18 : Compare the mean of the Gross Rent to the Standard Rent**
+
+```{r eval=FALSE}
+library(dplyr)
+library(ggpubr)
+
+# filter the gross data from the main data and avoiding the null values and the values which are less than 0.
+gross.rent <- mainData %>% select(GRNTP) %>% filter(GRNTP != "NA" , GRNTP != 0) %>% na.omit(month.rent)
+
+# summary of the data
+summary(gross.rent$GRNTP)
+
+# plotting the histogram plot -to visualize the normality around the mean
+ggplot(gross.rent, aes(x=GRNTP)) + 
+ geom_histogram(aes(y=..density..), colour="black", fill="yellow" , alpha = 0.8)+
+ geom_density(alpha=.2, fill="#FF6666" , color = 'green') + labs(title="Histogram for Gross Rent") +
+  labs(x="Gross Rent", y="Desnity Values") + theme(plot.title = element_text(hjust = 0.5))  + geom_vline(aes(xintercept=mean(GRNTP)),
+            color="blue", linetype="dashed", size=1)
+
+# testing the normality here with qqplot
+ggqqplot(gross.rent$GRNTP)
+
+
+# for the large data set we use kolmogorov-smirnov test rather than shapiro wilkie test.
+ks.test(gross.rent$GRNTP , y = 'pnorm',mean = 1070.964 , sd = 612.037)
+
+ # performig the one sample T- test here.
+t.test(gross.rent$GRNTP, mu = 1012)
+```
 
