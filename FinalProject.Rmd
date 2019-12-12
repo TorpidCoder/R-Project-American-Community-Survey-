@@ -19,7 +19,7 @@ The Public Use Microdata Sample (PUMS) contains a sample of actual responses to 
 
 The data contains 7,487,361 rows and 234 columns. Each row this very data set is scribbled by a response from one person.
 
-Since the data is quite large , I have filtered out only 8 cases which is required for my analysis. The important variables I have choosen for my analysis are "ST","VALP","LAPTOP","HISPEED","FULP","GASP","TYPE","FTAXP","TAXP","WIF","HINCP","GRNTP","RNTP","FINCP","RMSP","NP","ADJINC","ACR","FINCP","FHINCP","INSP".
+Since the data is quite large , I have filtered out only 8 cases which is required for my analysis. The important variables I have choosen for my analysis are as follows :-
 
 ## Data Description
 
@@ -44,27 +44,213 @@ Since the data is quite large , I have filtered out only 8 cases which is requir
 <span style="color:blue">**`ACR`**</span> | Lot size | categorical, variable / data as numerical | N/A (GQ/not a one-family house or mobile home);1 -House on less than one acre; 2-House on one to less than ten acres;3 -House on ten or more acres.
 <span style="color:blue">**`FINCP`**</span> | Family income (past 12 months, use ADJINC to adjust FINCP to constant dollars) | categorical, variable / data as numerical | N/A (GQ/vacant);00000000 -No family income;-0059999 -Loss of $59,999 or more;-0059998..-0000001 - Loss of $1 to $59,998;00000001 - $1 or Break even;00000002..99999999 -Total family income in dollars (Components are rounded)
 <span style="color:blue">**`INSP`**</span> | Fire/hazard/flood insurance (yearly amount, yearly amount, use ADJHSG to adjust INSP to constant dollars) | numerical, discrete | N/A (GQ/vacant/not owned or being bought);00000 - None ; 00001..10000 - $1 to $10000 (Rounded and top-coded).
+<span style="color:blue">**`FTAXP`**</span> | Property taxes (yearly amount) allocation flag | numerical, discrete | N/A (GQ);No;Yes
+<span style="color:blue">**`FHINCP`**</span> | Household income (past 12 months) allocation flag | numerical, discrete | N/A (GQ);No;Yes
+<span style="color:blue">**`FINSP`**</span> | Fire, hazard, flood insurance (yearly amount) allocation flag | numerical, discrete | N/A (GQ);No;Yes
+<span style="color:blue">**`YBL`**</span> | When structure first built | numerical, discrete | N/A (GQ);1939 or earlier;1940 to 1949;1950 to 1959;1960 to 1969;1970 to 1979;1980 to 1989;1990 to 1999;2000 to 2004;2005;2006;2007;2008;2009;2010;2011;2012;2013;2014;2015;2016;2017.
+<span style="color:blue">**`MV`**</span> | When moved into this house or apartment | categorical, variable / data as numerical | N/A (GQ);12 months or less;13 to 23 months;2 to 4 years;5 to 9 years;10 to 19 years;20 to 29 years;30 years or more.
+<span style="color:blue">**`HHL`**</span> | Household language | categorical, variable | N/A (GQ);English only;Spanish;Other Indo-European languages;Asian and Pacific Island language;Other language;
+<span style="color:blue">**`WIF`**</span> | Workers in family during the past 12 months | categorical, variable | N/A (GQ);No workers;1 worker;2 worker;3 or More workers in Family.
+<span style="color:blue">**`VEH`**</span> | Vehicles (1 ton or less) available | categorical, variable | N/A (GQ);1 vehicle;2 vehicles;3 vehicles;4 vehicles;5 vehicles;6 vehicle or more.
+
+
+
 
 
 
 ```{r}
 
 # reading the data set only
+
 library(data.table)
+library(pander)
+library(kableExtra)
+library(skimr)
 
-start_time <- Sys.time()
-mainData <- fread("MainData.csv")
-end_time <- Sys.time()
+
+# start_time <- Sys.time()
+# mainData <- fread("MainData.csv")
+# end_time <- Sys.time()
 
 
-end_time - start_time
+#end_time - start_time
 options(scipen=10000)
 
-# cols <- c("ST", "VALP")
-# selectcols <- fread("/Users/sahilnagpal/Desktop/TrentU/Data-Analytics-R/Project/MainData.csv",select = cols)
+start_time <- Sys.time()
+cols <- c("ST", "VALP","LAPTOP","HISPEED","FULP","GASP","TYPE","TAXP","WIF","HINCP","GRNTP","RNTP","FINCP","RMSP","NP","ADJINC","ACR","INSP","FTAXP","FHINCP","FINSP","YBL","MV","HHL","VEH")
+mainData <- fread("MainData.csv",select = cols)
+end_time <- Sys.time()
+end_time - start_time
+
+
+
+pander(summary(mainData))
+skim(mainData)
+
+```
+
+<span style="color:blue">**Graphical Summary of the data**</span>
+
+Above is the fancy tabular and the histo summary of the data I have taken out from the actual data and I am going to work on this data to create the insightful graphics and insights.
+
+From the above it is clearly shown that the data consist of lot of Null Values.
+
+**Note :** I have used the **skimR** (skimr handles different data types and returns a skim_df object which can be included in a tidyverse pipeline or displayed nicely for the human reader.) and the **pander** package for this beautiful and human readable summary of data.
+
+
+<span style="color:blue">**Insightful graphical and tabular summaries of the data**</span>
+
+```{r}
+
+library(kableExtra)
+library(dplyr)
+library(magrittr)
+library(DT)
+options(DT.options = list(pageLength = 30))
+
+
+top10.mainData <- mainData[1:10]
+top10.mainData %>%
+    datatable(options = list(dom = "t", ordering = FALSE), 
+              rownames = FALSE,
+              width = 30) %>%
+    formatStyle(c("ST", "VALP","LAPTOP","HISPEED","FULP","GASP","TYPE","TAXP","WIF","HINCP","GRNTP","RNTP","FINCP","RMSP","NP","ADJINC","ACR","INSP","FTAXP","FHINCP","FINSP","YBL","MV","HHL","VEH"), backgroundColor = styleEqual(NA, "skyblue"))
+
+```
+
+<span style="color:blue">**The knowledge you convey regarding the overall make-up of the data you chose to use**</span>
+
+**Above Tabular format of data shows the first 10 rows of the data and the Sky Blue rectangles reflects that there is no value present in that cell.**
+
+This data is basically rooted from American Community Survey. The American Community Survey collects data on an ongoing basis, January through December, to provide every community with the information they need to make important decisions.
+They release new data every year, in the form of estimates, in a variety of tables, tools, and analytical reports.
+
+After gone throught all the major part parcel of this data , I have decided to work upon the 'Housing Data' (The American Community Survey basically publish Housing as well as the Population Data). I think I might be the only one who will work on 'Housing Data'. The major reason behind that I want to know more deeply about the housing scheme and information present in the United States.
+
+This Housing Data will provide better insights in terms of Demographics information of the United States of America. Through this data you will both learn about the Data profiles and narrative profiles of Housing  particulars and facts.
+
+Once I decided to work upon Housing Data , I start mining the columns on which I would like to work upon. After spending couple of days and after performing scrutiny on the columns I have decided to work upon
+
+**"ST", "VALP","LAPTOP","HISPEED","FULP","GASP","TYPE","TAXP","WIF","HINCP","GRNTP","RNTP","FINCP","RMSP","NP","ADJINC","ACR","INSP","FTAXP","FHINCP","FINSP","YBL","MV","HHL","VEH"**.
+
+The above columns which I have decided almost covers all the possible yields and edges of this data. Also these very columns reflects the **Economical , Social and Demographical** perception of the people of United States.
+
+
+
+```{r}
+
+library(dplyr)
+library(tidyverse)
+library(ggdark)
+library(ggplot2)
+
+
+
+missing.values <- mainData %>%
+    gather(key = "key", value = "val") %>%
+    mutate(is.missing = is.na(val)) %>%
+    group_by(key, is.missing) %>%
+    summarise(num.missing = n()) %>%
+    filter(is.missing==T) %>%
+    select(-is.missing) 
+
+missing.values$id <- seq(1,21)
+
+
+label_data <- missing.values
+number_of_bar <- nrow(label_data)
+angle <-  90 - 360 * (label_data$id) /number_of_bar
+label_data$hjust<-ifelse( angle < -90, 1, 0)
+label_data$angle<-ifelse(angle < -90, angle+180, angle)
+
+ggplot(missing.values, aes(x=as.factor(id), y=num.missing)) +       # Note that id is a factor. If x is numeric, there is some space between the first bar
+  
+  # This add the bars with a blue color
+  geom_bar(stat="identity", fill=alpha("yellow", 1)) +
+  
+  # Limits of the plot = very important. The negative value controls the size of the inner circle, the positive one is useful to add size over each bar
+  ylim(-1,120) +
+  
+  # Custom the theme: no axis title and no cartesian grid
+  theme_minimal() +
+  theme(
+    axis.text = element_blank(),
+    axis.title = element_blank(),
+    panel.grid = element_blank(),
+    plot.margin = unit(rep(-1,4), "cm")      # Adjust the margin to make in sort labels are not truncated!
+  ) +
+  
+  # This makes the coordinate polar instead of cartesian.
+  coord_polar(start = 0) +
+  
+  # Add the labels, using the label_data dataframe that we have created before
+  geom_text(data=label_data, aes(x=id, y=num.missing+10, label=key, hjust=hjust), color="White", fontface="bold",alpha=0.6, size=2.5, angle= label_data$angle, inherit.aes = FALSE ) + scale_y_continuous(limits=c(0,100) + scale_x_continuous(limits=c(0,100))) + dark_theme_void() + labs(title = "Circular Bar Plot of missing values")
+
+
 
 
 ```
+
+<span style="color:blue">**Meaningful pre-processing : Which Columns contains more Unwanted and Unusual Values**</span>
+
+
+When working with Huge data , it is ones responsiblity to filter out the junk information from the data. Doing this not only clean up the data but also yields the fruitful plus precise(accurate) results from the processing. Also this will helps to reduce the False Postives and False Negatives from the analysis.
+
+I have created **Circular Bar plot** (One of its own kind) which actually shows which of the columns contains more unuseful information. **The bigger the bar the more it contains the null values and the outliers.**
+
+I have explicitly handle those null values and outliers while processing which however produces good visualizing results. The three columns **Type** , **NP** and **ADJINC** is missing from this plot since they does not contain any null values. I have explicilty check these columns and they contain important contraints which should be mandatory.
+
+```{r}
+
+library(dplyr)
+library(ggplot2)
+library(plotly)
+library(tidyverse)
+library(ggdark)
+
+
+missing.values.percentage <- mainData %>%
+  gather(key = "key", value = "val") %>%
+  mutate(isna = is.na(val)) %>%
+  group_by(key) %>%
+  mutate(total = n()) %>%
+  group_by(key, total, isna) %>%
+  summarise(num.isna = n()) %>%
+  mutate(pct = num.isna / total * 100)
+
+
+
+
+levels <-
+    (missing.values.percentage  %>% filter(isna == T) %>% arrange(desc(pct)))$key
+
+percentage.plot <- missing.values.percentage %>%
+      ggplot() +
+        geom_bar(aes(x = reorder(key, desc(pct)), 
+                     y = pct, fill=isna , width=.8), 
+                 stat = 'identity', alpha=0.35 , position = position_dodge() , colour="black") +
+      scale_x_discrete(limits = levels) +
+      scale_fill_manual(name = "", 
+                        values = c('purple3', 'gold1'), labels = c("Present", "Missing")) +
+      coord_flip() +
+      labs(title = "Percentage of missing values", x =
+             'Variable', y = "% of missing values")
+
+
+percentage.ploting <- ggplotly(percentage.plot)
+percentage.ploting
+
+```
+
+<span style="color:blue">**Meaningful pre-processing : Which Columns contains more NULL VALUES (NA) - Dynamic Representation of Percentages(Plotly)**</span>
+
+<span style="color:Red">**This plot is a dynamic plot , by hovering on the columns of this graph you get the clearly description of the data. Also , you can filter the TRUE and FALSE values here by just clicking on the Label of TRUE/FALSE on the right. We can also save this image by just one click , there is no need to write any code to download that plus you can also ZOOM IN and ZOOM OUT in this graph.**</span>
+
+Null Values are the biggest threat to any analysis. Many of the times it happens that results got deviate from the path of accuracy just because of the presence of the NULL Values.
+
+Before we apply any algorithm on our data, it is obvious that the data should be tidy or structured. But in the real world, the data mostly we initially see is unstructured. So in order to make it tidy and to further apply any algorithm to derive the insights, data has to be cleaned. The major reason why the data is not tidy is because of the presence of missing values and outliers.
+
+In the above analysis, I have created a **Dynamic Bar Plot** which gives the in-depth description of the null value percentages present in the each columns. This plot clearly tells that which data contains how much percentage of actual values and how much percentage of Null Values.   
 
 ## 2. Methodology
 
@@ -373,7 +559,7 @@ corrplot(M, method = "number",col=brewer.pal(n=8, name="PuOr"))
 
 ```
 
-<span style="color:blue">**Correlation Coefficient**</span>
+<span style="color:blue">**Relationship between the Economic Entites in the data**</span>
 
 The correlation coefficient is a statistical measure that calculates the strength of the relationship between the relative movements of two variables. The values range between -1.0 and 1.0. A calculated number greater than 1.0 or less than -1.0 means that there was an error in the correlation measurement. A correlation of -1.0 shows a perfect negative correlation, while a correlation of 1.0 shows a perfect positive correlation. A correlation of 0.0 shows no relationship between the movement of the two variables.\
 
@@ -602,7 +788,7 @@ ggscatter(income.house.data.df1, x = "AdjustedHousehold_Inc", y = "ACR",
 
 ```
 
-<span style="color:blue">**Correlation coefficients**</span>
+<span style="color:blue">**Does House Income depicts the standard of Living in the United States**</span>
 
 Correlation coefficients are used in statistics to measure how strong a relationship is between two variables.\
 The correlation coefficient of two variables in a data set equals to their **covariance** divided by the product of their individual **standard deviations**. It is a normalized measurement of how the two are linearly related.
@@ -1089,7 +1275,7 @@ In the predictive section I have predicted that whether the Room Numbers actuall
 
 5. From the analysis I found that Americans dont care much about their houses and invest almost 1/10th of their salary on house insurance. Infact I checked that on major 5 cities including New York but did not get much fruitful results which makes New York exceptional.
 
-6. I also got to know that the Year of Consrtuction also decided the value of the House which is not pretty much abvious in every country.The houses constructed after the year 2015 has the maximum value in a decade. Also , the United States consist of lot of Spaniards. Spanish speaking people are the second largest housing in United States after English Speakers.
+6. I also got to know that the Year of Construction also decided the value of the House which is not pretty much abvious in every country.The houses constructed after the year 2015 has the maximum value in a decade. Also , the United States consist of lot of Spaniards. Spanish speaking people are the second largest housing in United States after English Speakers.
 
 7. After analysis , I was so fascinated to know that many houses in United States of America has zero worker in a home. Though there are some chance of discripency here because survival in country like United States without earning is quite difficult (Almost Impossible).
 
