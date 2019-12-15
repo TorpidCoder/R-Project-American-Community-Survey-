@@ -9,7 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## 1. Data Summary
+## 1. <u>Data Summary</u>
 
 The data is recieved from the Amercian Communinity Survey. The data basically consist of the personal information of the people currently residing in United States of America between 2012 - 2016. This is basically an observational study on over 10 Million of records of data being collected. 
 
@@ -56,9 +56,9 @@ Since the data is quite large , I have filtered out only 8 cases which is requir
 
 
 
+### <u>Intricated Data Information</u>
 
-
-```{r}
+```{r echo=FALSE, warning=FALSE, message=FALSE}
 
 # reading the data set only
 
@@ -97,7 +97,8 @@ skim(mainData)
 
 ```
 
-<span style="color:blue">**Graphical Summary of the data**</span>
+
+<span style="color:blue"><u>**Graphical Summary of the data**</u></span>
 
 Above is the fancy tabular and the histo summary of the data I have taken out from the actual data and I am going to work on this data to create the insightful graphics and insights.
 
@@ -106,9 +107,10 @@ From the above it is clearly shown that the data consist of lot of Null Values.
 **Note :** I have used the **skimR** (skimr handles different data types and returns a skim_df object which can be included in a tidyverse pipeline or displayed nicely for the human reader.) and the **pander** package for this beautiful and human readable summary of data.
 
 
-<span style="color:blue">**Insightful graphical and tabular summaries of the data**</span>
 
-```{r}
+<span style="color:blue"><u>**Insightful graphical and tabular summaries of the data**</u></span>
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
 
 library(kableExtra)
 library(dplyr)
@@ -126,7 +128,8 @@ top10.mainData %>%
 
 ```
 
-<span style="color:blue">**The knowledge you convey regarding the overall make-up of the data you chose to use**</span>
+<span style="color:blue"><u>**The knowledge you convey regarding the overall make-up of the data you chose to use**</u></span>
+
 
 **Above Tabular format of data shows the first 10 rows of the data and the Sky Blue rectangles reflects that there is no value present in that cell.**
 
@@ -145,7 +148,7 @@ The above columns which I have decided almost covers all the possible yields and
 
 
 
-```{r}
+```{r echo=FALSE, warning=FALSE, message=FALSE}
 
 library(dplyr)
 library(tidyverse)
@@ -192,14 +195,15 @@ ggplot(missing.values, aes(x=as.factor(id), y=num.missing)) +       # Note that 
   coord_polar(start = 0) +
   
   # Add the labels, using the label_data dataframe that we have created before
-  geom_text(data=label_data, aes(x=id, y=num.missing+10, label=key, hjust=hjust), color="White", fontface="bold",alpha=0.6, size=2.5, angle= label_data$angle, inherit.aes = FALSE ) + scale_y_continuous(limits=c(0,100) + scale_x_continuous(limits=c(0,100))) + dark_theme_void() + labs(title = "Circular Bar Plot of missing values")
+  geom_text(data=label_data, aes(x=id, y=num.missing+10, label=key, hjust=hjust), color="White", fontface="bold",alpha=0.6, size=2.5, angle= label_data$angle, inherit.aes = FALSE ) + scale_y_continuous(limits=c(0,100) + scale_x_continuous(limits=c(0,100))) + dark_theme_void() + labs(title = "Circular Bar Plot of Missing and Junk values")
 
 
 
 
 ```
 
-<span style="color:blue">**Meaningful pre-processing : Which Columns contains more Unwanted and Unusual Values**</span>
+
+<span style="color:blue"><u>**Meaningful pre-processing : Which Columns contains more Unwanted and Unusual Values**</u></span>
 
 
 When working with Huge data , it is ones responsiblity to filter out the junk information from the data. Doing this not only clean up the data but also yields the fruitful plus precise(accurate) results from the processing. Also this will helps to reduce the False Postives and False Negatives from the analysis.
@@ -208,7 +212,9 @@ I have created **Circular Bar plot** (One of its own kind) which actually shows 
 
 I have explicitly handle those null values and outliers while processing which however produces good visualizing results. The three columns **Type** , **NP** and **ADJINC** is missing from this plot since they does not contain any null values. I have explicilty check these columns and they contain important contraints which should be mandatory.
 
-```{r}
+
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
 
 library(dplyr)
 library(ggplot2)
@@ -241,7 +247,7 @@ percentage.plot <- missing.values.percentage %>%
       scale_fill_manual(name = "", 
                         values = c('purple3', 'gold1'), labels = c("Present", "Missing")) +
       coord_flip() +
-      labs(title = "Percentage of missing values", x =
+      labs(title = "Percentage of Missing Values (Dynamic Chart)", x =
              'Variable', y = "% of missing values")
 
 
@@ -250,9 +256,9 @@ percentage.ploting
 
 ```
 
-<span style="color:blue">**Meaningful pre-processing : Which Columns contains more NULL VALUES (NA) - Dynamic Representation of Percentages(Plotly)**</span>
+<span style="color:blue"><u>**Meaningful pre-processing : Which Columns contains more NULL VALUES (NA) - Dynamic Representation of Percentages(Plotly)**</u></span>
 
-<span style="color:Red">**This plot is a dynamic plot , by hovering on the columns of this graph you get the clearly description of the data. Also , you can filter the TRUE and FALSE values here by just clicking on the Label of TRUE/FALSE on the right. We can also save this image by just one click , there is no need to write any code to download that plus you can also ZOOM IN and ZOOM OUT in this graph.**</span>
+<span style="color:Red"><u>**This plot is a dynamic plot , by hovering on the columns of this graph you get the clearly description of the data. Also , you can filter the TRUE and FALSE values here by just clicking on the Label of TRUE/FALSE on the right. We can also save this image by just one click , there is no need to write any code to download that plus you can also ZOOM IN and ZOOM OUT in this graph.**</u></span>
 
 Null Values are the biggest threat to any analysis. Many of the times it happens that results got deviate from the path of accuracy just because of the presence of the NULL Values.
 
@@ -260,7 +266,7 @@ Before we apply any algorithm on our data, it is obvious that the data should be
 
 In the above analysis, I have created a **Dynamic Bar Plot** which gives the in-depth description of the null value percentages present in the each columns. This plot clearly tells that which data contains how much percentage of actual values and how much percentage of Null Values.   
 
-## 2. Methodology
+## 2. <u>Methodology</u>
 
 To perform the analysis on this I have taken the housing data and have covered all the major columns which actually give precise and detailed information about the housing information and patterns across the United States of America. Since this data comes with Property Information , Resources Consumption, and their expenditure information , I have majorily and explicitly focus on the analysis which yields the information related to Housing Scheme. In this project I have also covered the variablity of each economic variable and put the light on its usage and on its dominion on other important variables.\
 
@@ -268,34 +274,35 @@ Also,this data comes with the demographics information which helps to predict th
 
 Since this data also consist of **State Information** so it was quite obligatory to discuss about the information with respect to the pattern of data across different states.I have unanimously compared the states in terms of the various statistics which eventually produce **Jaw Dropping Results** which I initially not expecting (Though I wonder) but comes with true results.
 
-**While following the Methodology , following things raised :-**
+**<u>While following the Methodology , following things raised :-</u>**
 
-<span style="color:blue">**How did you deal with missing values? What impact does your approach have on the interpretation or generalizability of the resulting analysis?**</span>
+<span style="color:blue"><u>**How did you deal with missing values? What impact does your approach have on the interpretation or generalizability of the resulting analysis?**</u></span>
+
 * Honsetly speaking, In sum of total, this data consist of more 'NA's rather than the actual information. Almost all the columns consist of the 'NA' present in it which is quite obvious since its an actual and opinion data where information availability is not obvious all the time.
 
 * To overcome this problem , I have removed the missing values (NA) from the variables that is involved in our analysis and stored the data into a individual dataframes. Dplyr library helps here to filter the data which is not useful and is not proximity of our usage.
 
 * Removing the NA's from the data not only produce the clean and tidy results but its also produce the valuable and precise results. Removing the NA from the data increase the importance of the column and I have observed the difference between the results with NA and the results without NA. For intance - NA always deviates the result from the actual results/outcome and this would increase the chance of what is called **FALSE POSITIVE**.
 
-<span style="color:blue">**How did you deal with outliers?**</span>
+<span style="color:blue"><u>**How did you deal with outliers?**</u></span>
 
 * Since this data is actual information (opinion and option based) there are mere chances of having the outliers. Most of the outliers in this data are usually the NA which are present in almost every columns. To overcome this issue I first address whether this value is really an outlier that needs attention or its just the normal false positive.
 * To deal with that I removed that from the data owing to the fact that outliers can drastically bias/change the fit estimates and predictions. However those were not much influential.
 
-<span style="color:blue">**How did you deal with weights & income adjustment values?**</span>
+<span style="color:blue"><u>**How did you deal with weights & income adjustment values?**</u></span>
 
 * There is no standard way of addressing weights. While many R functions have a weights parameter, there is no consistency in how they are intepreted: Most commonly, weights in R are interpreted as frequency weights. I have deal it by creating equal mean (Standard Mean) of the data.
 However Weights generally leads to create the standard error.
 
 * The income values present need adjustment which was clearly mention the Data Dictionary. It clearly shows that the income value should be adjusted with 'ADJHSG' or with the 'ADJINC'.
 
-<span style="color:blue">**Did you produce any tables or plots that you thought would reveal interesting trends but didn’t?**</span>
+<span style="color:blue"><u>**Did you produce any tables or plots that you thought would reveal interesting trends but didn’t?**</u></span>
 
 * 1.In order to give the states wise family members plotting , I was trying to create a **Circular Bar Plot** which gives a good view of graph and clearly depicts the results in fancy way but I was not able to make the create the actuall angles which helps me to divide the circular plot into cluster.
 
 * 2.I was also trying to make the **dense Heat map** which shows the relation between the Value of the Property and the Amenities Present in the House but due to the factor plotting I was not able to create in that heat map , the darker section shows that the house the maximum amenities holds the maximum value in terms of values of the price.
 
-<span style="color:blue">**What’s the analysis that you finally settled on? What relationships do you investigate in the final analysis?**</span>
+<span style="color:blue"><u>**What’s the analysis that you finally settled on? What relationships do you investigate in the final analysis?**</u></span>
 
 * In the findings section I have analysed the major relationship between the economic variables/columns present in the data which actually tells about the economic circumstances of a particular demographics. I have also compared the state wise section which differentiate the coherence and distinctiveness of a state.
 
@@ -306,13 +313,14 @@ However Weights generally leads to create the standard error.
 * I have also introduce the **Dynamic Graphs** using **plotly** where we can filter the graph on the basis of condition and also check the value of each section along wth its plotting attribute.
 
 
-## 3. Findings
+## 3. <u>Findings</u>
 
-**Following are the findings I come up with (It consist of the Tabular Summaires , Graphical Summeries , All the predictive outputs , Statistical Significance) :**
+<u>**Following are the findings I come up with (It consist of the Tabular Summaires , Graphical Summeries , All the predictive outputs , Statistical Significance) :</u>**
 
-<span style="color:skyblue">**Analysis-1**</span>
 
-```{r}
+### <span style="color:DodgerBlue"><u>Analysis-1</u></span>
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
 
 library(dplyr)
 library(ggplot2)
@@ -376,11 +384,9 @@ plot.map (geographical.rep.table, "Average Property Value By States in US", "Clu
                                   size=0.5, linetype="solid", 
                                   colour ="white"))
 
-
-
 ```
 
-<span style="color:blue">**Property Value in United States**</span>
+#### <span style="color:blue"><u>**Property Value in the United States**</u></span>
 
 Working on the Houses data definitely and should put the light on the value of the Property.\
 
@@ -388,17 +394,18 @@ Working on the Houses data definitely and should put the light on the value of t
 
 In this **analysis** I am examining the states with Higher Property Value. Although I have some pre-thoughts regarding it that there are some states which actually falls in this analysis (of course I know that New York should give higher result, if not then there is some problem because new york is considered to be as the most expensive place on earth).\
 
-A **statewise map** gives a good visualization here. Note that I am calculating the average value.\
+A **statewise map** gives a good visualization here. Note that I am calculating the average value.Also , the map with darker region mean that the value in that region is quite (darker means maximum value).\
 
-**Observation comes Out**
+<u>**Observation comes Out**</u>
 
 **Bingo !!**\
 My thought was right , from this map we can easily says that the average value of houses in New York is much more higher than the values in the other state. The cluster of values also helps us to get the utmost values.
 
 
-<span style="color:skyblue">**Analysis-2**</span>
 
-```{r}
+### <span style="color:DodgerBlue"><u>Analysis-2</u></span>
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
 user.laptop.hispeed <- mainData %>% filter(LAPTOP != 'b' , LAPTOP ==1 , HISPEED !='NA' ) %>% select(LAPTOP , HISPEED)
 user.laptop.hispeed.pie <- user.laptop.hispeed %>% group_by(LAPTOP,HISPEED) %>% summarise(COUNT = n()) %>% mutate(lab.ypos = cumsum(COUNT) - 0.5*COUNT)
 user.laptop.hispeed.pie$HISPEED <- factor(user.laptop.hispeed.pie$HISPEED , labels = c("Yes" , "No"))
@@ -414,7 +421,8 @@ position = position_stack(vjust = 0.8) , check_overlap = T , size = 3.5) + labs(
 )
 ```
 
-<span style="color:blue">**Laptop Users with High Speed Internet.**</span>
+#### <span style="color:blue"><u>**Laptop Users with High Speed Internet.**</u></span>
+
 
 **We all know that United States is on the top in terms of creating the technoloy as well as the usage of technology.**
 
@@ -422,14 +430,16 @@ It is so exciting to check whether the people of united states have good and hig
 
 **Being a first world Country I am assuming that more than 95% population should have an awesome interent service.**\
 
-**Observation comes Out**\
+<u>**Observation comes Out**</u>
+
 I have plotted a pie chart which clearly makes my assumption almost wrong. Almost **87%** of United States Population is actually enjoying the high speed internet services where as **more than 10 %** of the population of United States are still struggling to get the High Speed Internet.\
 This is the era of 2019, US should do something for these people and I am hoping that US actually starts something to solve this issue.
 
 
-<span style="color:skyblue">**Analysis-3**</span>
 
-```{r}
+### <span style="color:DodgerBlue"><u>Analysis-3</u></span>
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
 
 library(tidyverse)
 
@@ -459,7 +469,8 @@ ggplot(state.wise.consumption.data, aes(x = ST, y = Value, fill = Stat)) +
 
 ```
 
-<span style="color:blue">**Natural Resources is in Danger!**</span>
+#### <span style="color:blue"><u>**Natural Resources is in Danger!**</u></span>
+
 
 The fuel and Gas consumption is a biggest thread to Natural Resources since it is getting deplete day by day. It is also well known that United States of America is the only country with maximum consumption of natural resources. In order to check that I have performed a small analysis.\
 
@@ -469,9 +480,9 @@ To verify the above statement - I have plotted a bar chart which shows the fuel 
 However this graph does not have concrete evidence to prove that the number of automobile figure is high for a specific state.
 
 
-<span style="color:skyblue">**Analysis-4**</span>
 
-```{r}
+### <span style="color:DodgerBlue"><u>Analysis-4</u></span>
+```{r echo=FALSE, warning=FALSE, message=FALSE}
 
 library(readr)
 library(dplyr)
@@ -519,7 +530,8 @@ size = 3,color="black",family="Times")) + theme(legend.box.background = element_
 
 ```
 
-<span style="color:blue">**House Tax is Quite Affordable**</span>
+#### <span style="color:blue"><u>**House Tax is Quite Affordable**</u></span>
+
 
 Depending on where you live, property taxes can be a small inconvenience or a major burden.\
 
@@ -533,16 +545,18 @@ I am expecting that the amenities present in the house and the size of the house
 **Based on this link [link] https://www.businessinsider.com/average-property-taxes-every-us-state#51-alabama-1 : Alabama has the lowest property taxes in the US. Now is the time to check that.**
 
 
-**Observation comes Out**\
-States near New York and other states like California , illinois and to name a few has bit higher average property tax cost as compared to other states present in USA.\
+<u>**Observation comes Out**</u>
+
+States near New York and other states like California , illinois and to name a few has bit higher average property tax cost as compared to other states present in USA.
+
 And Yes ! That link was right , after ploting this map we are sure that **Alabama has the lowest property taxes in the US**. 
 
 
 
-<span style="color:skyblue">**Analysis-5**</span>
+### <span style="color:DodgerBlue"><u>Analysis-5</u></span>
 
 
-```{r}
+```{r echo=FALSE, warning=FALSE, message=FALSE}
 
 
 # Coorelation between all economic aspect columns which proves the basic income and expenditure in a household.
@@ -567,7 +581,8 @@ corrplot(M, method = "number",col=brewer.pal(n=8, name="PuOr"))
 
 ```
 
-<span style="color:blue">**Relationship between the Economic Entites in the data**</span>
+#### <span style="color:blue"><u>**Relationship between the Economic Entites in the data**</u></span>
+
 
 The correlation coefficient is a statistical measure that calculates the strength of the relationship between the relative movements of two variables. The values range between -1.0 and 1.0. A calculated number greater than 1.0 or less than -1.0 means that there was an error in the correlation measurement. A correlation of -1.0 shows a perfect negative correlation, while a correlation of 1.0 shows a perfect positive correlation. A correlation of 0.0 shows no relationship between the movement of the two variables.\
 
@@ -583,7 +598,7 @@ The equation for the correlation\
 
 **Above are the columns which actually shows he true color of economical condition of family and a house.** In order check whether these are actually correlated to each other we have performed a correlation check between these very columns.
 
-**Observation comes Out from this analysis**
+<u>**Observation comes Out from this analysis**</u>
 
 I have explicitly plotted the ellipse which shows the type of correlation. From these ellipse and the figures confidently states that there is a significant correlation among these variables and it also states that it is a positive correlation.
 
@@ -591,10 +606,11 @@ I have explicitly plotted the ellipse which shows the type of correlation. From 
 
 
 
-<span style="color:skyblue">**Analysis-6**</span>
+
+### <span style="color:DodgerBlue"><u>Analysis-6</u></span>
 
 
-```{r}
+```{r echo=FALSE, warning=FALSE, message=FALSE}
 
 library(moments)
 library(dplyr)
@@ -673,7 +689,7 @@ ggplot(lm.method.predict.test.metrics, aes(RMSP, valueofhouse)) +
 
 ```
 
-<span style="color:blue">**Linear Regression - Predict the Value of the House by the Number of Rooms Available.**</span>
+#### <span style="color:blue"><u>**Linear Regression - Predict the Value of the House by the Number of Rooms Available.**</u></span>
 
 Linear regression describes the relationship between a response variable (or dependent variable) of interest and one or more predictor (or independent) variables.\
 The simple linear regression is used to predict a quantitative outcome y on the basis of one single predictor variable x. The goal is to build a mathematical model (or formula) that defines y as a function of the x variable.
@@ -765,9 +781,9 @@ In a simple linear regression, this test is not really interesting since it just
 A large F-statistic will corresponds to a statistically significant p-value (p < 0.05). In our example, the F-statistic equal 10.34 producing a p-value of 0.003579, which is highly significant.
 
 
-<span style="color:skyblue">**Analysis-7**</span>
+### <span style="color:DodgerBlue"><u>Analysis-7</u></span>
 
-```{r}
+```{r echo=FALSE, warning=FALSE, message=FALSE}
 require(ggpubr)
 # Correlation between the Income and the House size
 
@@ -796,7 +812,8 @@ ggscatter(income.house.data.df1, x = "AdjustedHousehold_Inc", y = "ACR",
 
 ```
 
-<span style="color:blue">**Does House Income depicts the standard of Living in the United States**</span>
+#### <span style="color:blue"><u>**Does House Income depicts the standard of Living in the United States**</u></span>
+
 
 Correlation coefficients are used in statistics to measure how strong a relationship is between two variables.\
 The correlation coefficient of two variables in a data set equals to their **covariance** divided by the product of their individual **standard deviations**. It is a normalized measurement of how the two are linearly related.
@@ -804,7 +821,7 @@ The correlation coefficient of two variables in a data set equals to their **cov
 Here in this we are puting the efforts to check if the HouseHold Income of a Family is actually depicts/correlated to their to living style.\
 **It is quite interested to check if the people of United States with higher household income has a habit of living in the Extra Spacious Area (Big House)**.\
 
-**Observation comes Out from this analysis**
+<u>**Observation comes Out from this analysis**</u>
 
 From the statistcal examiniation/calculations we first remove the outliers and the null values from the data which result the good prediction.\
 
@@ -812,9 +829,9 @@ In order to check the correlation we have used the pearson corelation and this c
 By applying the pearson correlation we have the correlation value of **-0.002725119** which indicates the weak relation between the variables.\
 The graph clearly shows that there is certainly no relation between the household income and the house sizes.
 
-<span style="color:skyblue">**Analysis-8**</span>
+### <span style="color:DodgerBlue"><u>Analysis-8</u></span>
 
-```{r}
+```{r echo=FALSE, warning=FALSE, message=FALSE}
 library(viridis)
 library(ggdark)
 
@@ -868,13 +885,14 @@ ggplot(all.housing.insu.top5, aes(fill=flag, y=round(Avg), x="")) +
 
 ```
 
-<span style="color:blue">**How much Americans Care About Their Houses.**</span>
+#### <span style="color:blue"><u>**How much Americans Care About Their Houses.**</u></span>
+
 
 It will be so interesting to check if the people of canada is actually worried about their expenditure on house related issues or house insurance. Since the data consist of the Type of Property information and the House Insurance Information. We can easily check if people actually spends on caring of houses or they just take it as secondary expenditures.\
 
 **Fact Worth Noting - The average homeowners insurance premium rose by 3.6 percent in 2015, following a 3.3 percent increase in 2014, according to a January 2018 study by the National Association of Insurance Commissioners.The average renters insurance premium fell 1.1 percent in 2015 after rising 1.1 percent in 2014.**\
 
-**Observation comes Out from this analysis**\
+<u>**Observation comes Out from this analysis**</u>
 
 Americans usually not spent much money on House Insurance.They not even invest **1/4** of their income on house insurance. May be the reason behind that is the routine mortgages which is actually burgeoning day by day.\
 
@@ -883,9 +901,10 @@ Americans usually not spent much money on House Insurance.They not even invest *
 Also, we can say that the study/fact about the decrement in the investment towards house insurance is concrete and proven.
 
 
-<span style="color:skyblue">**Analysis-9**</span>
 
-```{r}
+### <span style="color:DodgerBlue"><u>Analysis-9</u></span>
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
 library(ggplot2)
 library(dplyr)
 library(ggdark)
@@ -934,7 +953,8 @@ ggplot(avg.price.yearwise, aes(x=`YBL`, y=mean.value , label = "")) +
 
 ```
 
-<span style="color:blue">**Value of Houses based On their Construction Year**</span>
+#### <span style="color:blue"><u>**Value of Houses based On their Construction Year.**</u></span>
+
 
 It has been noticed that the median value of a house on 1950 was around 7,400 USD but the shocking part is that the median value of a home in USA now ( 2017 Year ) is around 221,800 USA which is around 30 times of the value in 1950.\
 
@@ -942,14 +962,14 @@ It clearly shows that the construction year has also matters a lot. However the 
 
 Since our data consist of both value of the home and the construction year , so we can also confirm the above the above statement and can check if the construction year actaully matters a lot when it comes to price adjustment.\
 
-**Observation comes Out from this analysis**\
+<u>**Observation comes Out from this analysis**</u>
 
 From the graph it is clealy shown that the value of the houses is also depends on the contruction of the Year. From the diagram we can say that the average price of the house in between 1940 and 1990 were around 200,000 USD which has drastically increased to 310,000 (Average Price) in the last decade. It is also clearly shown that the houses built in the year of 2017 has the highest value of prices. So Americans should be ready to loosen their pockets when they even wonder to buy a home.\
 
 
-<span style="color:skyblue">**Analysis-10**</span>
+### <span style="color:DodgerBlue"><u>Analysis-10</u></span>
 
-```{r}
+```{r echo=FALSE, warning=FALSE, message=FALSE}
 
 library(ggplot2)
 library(dplyr)
@@ -978,20 +998,21 @@ ggplot() + geom_point(data = move.data, aes(x = MV, y = count.values, size = 5, 
   
 ```
 
-<span style="color:blue">**Linguistic Demographics versus Year of living**</span>
+#### <span style="color:blue"><u>**Linguistic Demographics versus Year of living.**</u></span>
+
 
 The America is known to be as a home for different culture people. With different culture people used to speak different languages (Not a their work places but at their home or when with same people around).\
 
 People who are living in United states always use english as their language at home. Here we have try to find out that what are the other languages people commonly used at their homes which eventually tells about the demographics.\
 
-**Observation comes Out from this analysis**\
+<u>**Observation comes Out from this analysis**</u>
 
 From this anaylsis it is clearly shown that maximum number of people who are living here from the past 20 years or more used english as their primary language at home. Also one more point comes from this analysys is that USA has lot of vicinity of Spanish Speakers (or Spaniards) among all other races and languages.
 
 
-<span style="color:skyblue">**Analysis-11**</span>
+### <span style="color:DodgerBlue"><u>Analysis-11</u></span>
 
-```{r}
+```{r echo=FALSE, warning=FALSE, message=FALSE}
 library(caret)
 library(dplyr)
 library(kernlab)
@@ -1032,7 +1053,8 @@ test_pred <- predict(svm_Linear, newdata = testing)
 test_pred
 
 ```
-<span style="color:blue">**Predicting the value of the house by family Income Using Support Vector Machine**</span>
+
+#### <span style="color:blue"><u>**Predicting the value of the house by family Income Using Support Vector Machine.**</u></span>
 
 SVM (Support Vector Machine) is a supervised machine learning algorithm which is mainly used to classify data into different classes. Unlike most algorithms, SVM makes use of a hyperplane which acts like a decision boundary between the various classes.
 **How does it works in our data**
@@ -1052,8 +1074,8 @@ Used prediction method is **"repeatedcv"**, and rotation count number is 10 for 
 This can definitely be burgeon and perfectly trained (make that 4.2 % from 1.88 by keep that model trained again and again) under robust computing infrastructure.**
 
 
-<span style="color:skyblue">**Analysis-12**</span>
-```{r}
+### <span style="color:DodgerBlue"><u>Analysis-12</u></span>
+```{r echo=FALSE, warning=FALSE, message=FALSE}
 
 library(dplyr)
 library(ggplot2)
@@ -1140,9 +1162,12 @@ ploting <- ggplotly(p)
 ploting
 
 ```
-<span style="color:blue">**State Wise - Number of Workers Present in a House (Dynamic Graph)**</span>
 
-<span style="color:red">**Please Note : This graph is created with under the plotly package and it is fully dynamic graph. Hower your mouse on the graph and you can find the statics just pointing on the bar. Also, you can save this chart by just one click. You can also zoom in and zoom out within the graph. You can also filter the data by just clicking on the WIF section**</span>
+#### <span style="color:blue"><u>**State Wise - Number of Workers Present in a House**</u></span>
+
+
+
+<span style="color:red">**Please Note : This graph is created with under the plotly package and it is fully dynamic graph. Hover your mouse on the graph and you can find the statics just pointing on the bar. Also, you can save this chart by just one click. You can also zoom in and zoom out within the graph. You can also filter the data by just clicking on the WIF section**</span>
 
 Since the household data consist of the information regarding the number of Workers in a house. 
 Somehow it is interesting to find out that which states has maximum numer of One Workers in house and which state has more than two workers in a house.
@@ -1152,13 +1177,14 @@ Somehow it is interesting to find out that which states has maximum numer of One
 **Observation comes Out from this analysis**
 
 **From the above dynamic graph it is clearly shown that:**
+
 * The maximum number of alone workers in family is present in California with a count of 148630.\
 * The minimum number of alone workers in family is present in District of Columbia with a count of 2005 only.\
 * The most interesting thing is that the most numnber of 0 Workers in a family is also present in California with a count of 65051 and the least number of 0 Workers in family is present in the District of Columbia with a count of a 883.\
 
 
-<span style="color:skyblue">**Analysis-13**</span>
-```{r}
+### <span style="color:DodgerBlue"><u>Analysis-13</u></span>
+```{r echo=FALSE, warning=FALSE, message=FALSE}
 # relationship bw workers in the family and monthly rent
 
 library(dplyr)
@@ -1184,7 +1210,8 @@ lwd = 2)
 
 ```
 
-<span style="color:blue">**Finding the Relationship between Number of Workers in a House and the Vehciles they Own**</span>
+#### <span style="color:blue"><u>**CHI-SQUARE : Finding the Relationship between Number of Workers in a House and the Vehciles they Own**</u></span>
+
 
 Performing the Chi-Square Test here - Chi-Square test is a statistical method to determine if two categorical variables have a significant correlation between them. Both those variables should be from same population and they should be categorical\
 Particularly in this test, we have to check the p-values. Moreover, like all statistical tests, we assume this test as a null hypothesis and an alternate hypothesis.\
@@ -1192,13 +1219,13 @@ The main thing is, we reject the null hypothesis if the p-value that comes out i
 
 We create a contigency table to perform that.
 
-**Observation comes Out from this analysis**
+<u>**Observation comes Out from this analysis**</u>
 
 **We have a high chi-squared value and a p-value of less than 0.05 significance level. So we reject the null hypothesis and conclude that WIF and VEH have a significant relationship.**
 This clearly shows that more number of members in a family actually needs more car as a source of transportation (Although this can also be depend on the income of the house.)
 
-<span style="color:skyblue">**Analysis-14**</span>
-```{r}
+### <span style="color:DodgerBlue"><u>Analysis-14</u></span>
+```{r echo=FALSE, warning=FALSE, message=FALSE}
 library(dplyr)
 library(ggpubr)
 
@@ -1227,7 +1254,8 @@ t.test(gross.rent$GRNTP, mu = 1012)
 
 ```
 
-<span style="color:blue">**Compare the mean of the Gross Rent to the Standard Rent**</span>
+#### <span style="color:blue"><u>**T-Test : Compare the mean of the Gross Rent to the Standard Rent**</u></span>
+
 
 In this analysis we are comparing the mean of the gross rent with the actual gross rent of the United States these days. To perform that we are using the T.Test over here. Specifically we are performing the **One-Sample T.Test**
 
@@ -1264,9 +1292,68 @@ From the results we have got the
 
 The p-value of the test is 2.2e-16, which is less than the significance level alpha = 0.05. We can conclude that the mean value of the gross is significantly different from median value of the gross value in United States.
 
+### <span style="color:DodgerBlue"><u>Analysis-15</u></span>
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+
+library(neuralnet)
+library(dplyr)
+library(devtools)
+source_url('https://gist.githubusercontent.com/fawda123/7471137/raw/466c1474d0a505ff044412703516c34f1a4684a5/nnet_plot_update.r')
+
+nndata<- mainData %>% select(INSP,FINCP,FULP,GASP,VALP) %>% filter(FINCP != "NA" , INSP != "NA",FULP != "NA",GASP != "NA") %>% na.omit(nndata)
+
+nndata <- head(nndata,1000)
+
+# Random sampling
+samplesizedata = 0.60 * nrow(nndata)
+set.seed(80)
+indexdatann = sample( seq_len ( nrow ( nndata ) ), size = samplesizedata )
+
+# Create training and test set
+datatrain = nndata[ indexdatann, ]
+datatest = nndata[ -indexdatann, ]
 
 
-## 4.Discussion
+
+## Scale data for neural network
+
+maxnn = apply(nndata , 2 , max)
+minnn = apply(nndata, 2 , min)
+scaled = as.data.frame(scale(nndata, center = minnn, scale = maxnn - minnn))
+
+trainNN = scaled[indexdatann , ]
+testNN = scaled[-indexdatann , ]
+
+
+set.seed(4)
+NN = neuralnet(VALP ~ INSP + FINCP + FULP + GASP , trainNN, hidden = 3 , linear.output = T )
+
+plot(NN , col.out = 'blue' , fontsize = 9,col.out.synapse = "red",col.intercept = "blue" , col.entry = 'skyblue',col.entry.synapse = 'red' , rep= "best")
+
+```
+
+#### <span style="color:blue"><u>**Neural Network - Predicting the Value of the Property by Corresponding relative Predictors**</u></span>
+
+<u>**Basics of Neural Network**</u>
+
+* A **neural network** is a model characterized by an activation function, which is used by interconnected information processing units to transform input into output.A neural network has always been compared to human nervous system. Information in passed through interconnected units analogous to information passage through neurons in humans.
+
+* The first layer of the neural network receives the raw input, processes it and passes the processed information to the hidden layers.
+
+* The **hidden layer** passes the information to the last layer, which produces the output. The advantage of neural network is that it is adaptive in nature. It learns from the information provided, i.e. trains itself from the data, which has a known outcome and optimizes its weights for a better prediction in situations with unknown outcome.
+
+* A **perceptron**, viz. single layer neural network, is the most basic form of a neural network.  A perceptron receives multidimensional input and processes it using a weighted summation and an activation function.
+
+**Our case - The objective is to predict VALP by the variables such as INSP, FINCP, FULP , GASP**
+
+This tells whether these variables are enough to predict the value of the house. This is quite helpful for a new comer in the area. This eventually can be used to calculate the VALP and to do the town planning as well. Since this tells about the proximity of the resources around.
+
+With the **error rate of 1.84** Approx we can say that some of these variables are very helpful in terms of predicting the value of the house and some are causing the randomness in the data which is also acting as an outlier here.
+
+
+
+
+## 4. <u>Discussion</u>
 
 After effectuating and completing the various noteworthy and significant analysis , I have come up with various outcomes and result which clearly tells about the housing pattern in the United States of America and distinguish between each and every variable in terms of maintaning the economy. Through this scrutiny , I got to know more about the demographical information of the United States of America.
 
@@ -1290,20 +1377,20 @@ In the predictive section I have predicted that whether the Room Numbers actuall
 8. Using the Chi Square test , I found that houses with most family also owns the most number of cars in a home which tells that people of United States are concerned about the transportation but not about living stakes.
 
 
-<span style="color:blue">**Are the models you fit believable?**</span>
+<span style="color:blue"><u>**Are the models you fit believable?**</u></span>
 
 I belive that the models I fit and used are the right models to work upon but in my case the only concern is about traning them in a recursive way so that they yield accpetable accuracy (which I some time lacks). I can also concern here about the machine because most of the model training is done on cloud based technology.
 
-<span style="color:blue">**How much confidence do you have in your analysis? Do you believe your conclusions? Are you confident enough in your analysis and findings to present them to policy makers?**</span>
+<span style="color:blue"><u>**How much confidence do you have in your analysis? Do you believe your conclusions? Are you confident enough in your analysis and findings to present them to policy makers?**</u></span>
 
 I have around 80%-85% confidence and sure about the conclusion I have constructed. Also there is always a room of Improvement everywhere. The conclusion I have constructed is completely helpful for Policy Simulation and Creation in a Country.
 I completely believe in the effort I have put on and also believes that this is quite helpful for a viewer. I am confident about my outputs and results here. Although I need work more upon the data plotting part.
 
 
 
-## 5. Overall Code and Appendix
+## 5. <u>Overall Code and Appendix</u>
 
-**Code-1 : Reading the data here inside this chunk**
+<u>**Code-1 : Reading the data here inside this chunk**</u>
 
 ```{r eval=FALSE}
 # reading the data set only
@@ -1343,7 +1430,7 @@ skim(mainData)
 ```
 
 
-**Code-2 : Getting the insight of data here**
+<u>**Code-2 : Getting the insight of data here**</u>
 
 ```{r eval=FALSE}
 library(kableExtra)
@@ -1361,7 +1448,7 @@ top10.mainData %>%
     formatStyle(c("ST", "VALP","LAPTOP","HISPEED","FULP","GASP","TYPE","TAXP","WIF","HINCP","GRNTP","RNTP","FINCP","RMSP","NP","ADJINC","ACR","INSP","FTAXP","FHINCP","FINSP","YBL","MV","HHL","VEH"), backgroundColor = styleEqual(NA, "skyblue"))
 ```
 
-**Code-3 : Checking the unwanted and null values present in the data**
+<u>**Code-3 : Checking the unwanted and null values present in the data**</u>
 
 ```{r eval=FALSE}
 library(dplyr)
@@ -1412,7 +1499,7 @@ ggplot(missing.values, aes(x=as.factor(id), y=num.missing)) +       # Note that 
   geom_text(data=label_data, aes(x=id, y=num.missing+10, label=key, hjust=hjust), color="White", fontface="bold",alpha=0.6, size=2.5, angle= label_data$angle, inherit.aes = FALSE ) + scale_y_continuous(limits=c(0,100) + scale_x_continuous(limits=c(0,100))) + dark_theme_void() + labs(title = "Circular Bar Plot of missing values")
 ```
 
-**Code-4 : Calculating the Null values and creating the insight**
+<u>**Code-4 : Calculating the Null values and creating the insight**</u>
 
 ```{r eval=FALSE}
 library(dplyr)
@@ -1455,7 +1542,7 @@ percentage.ploting
 ```
 
 
-**Code-5 : Calculating and plotting the average property value in USA by states**
+<u>**Code-5 : Calculating and plotting the average property value in USA by states**</u>
 
 ```{r eval=FALSE}
 library(dplyr)
@@ -1522,7 +1609,7 @@ plot.map (geographical.rep.table, "Average Property Value By States in US", "Clu
 ```
 
 
-**Code-6 : Calculating and plotting the Laptop users with High speed interent availablity**
+<u>**Code-6 : Calculating and plotting the Laptop users with High speed interent availablity**</u>
 
 ```{r eval=FALSE}
 user.laptop.hispeed <- mainData %>% filter(LAPTOP != 'b' , LAPTOP ==1 , HISPEED !='NA' ) %>% select(LAPTOP , HISPEED)
@@ -1541,7 +1628,7 @@ position = position_stack(vjust = 0.8) , check_overlap = T , size = 3.5) + labs(
 ```
 
 
-**Code-7 : Calculating and plotting the natural resources consumption in united states**
+<u>**Code-7 : Calculating and plotting the natural resources consumption in united states**</u>
 
 ```{r eval=FALSE}
 library(tidyverse)
@@ -1571,7 +1658,7 @@ ggplot(state.wise.consumption.data, aes(x = ST, y = Value, fill = Stat)) +
 ```
 
 
-**Code-8 : Calculating and plotting the average house tax by states in the United States**
+<u>**Code-8 : Calculating and plotting the average house tax by states in the United States**</u>
 
 ```{r eval=FALSE}
 library(mapproj)
@@ -1612,7 +1699,7 @@ size = 3,color="black",family="Times")) + theme(legend.box.background = element_
 ```
 
 
-**Code-9 : Checking and plotting the Economic entities in the United States**
+<u>**Code-9 : Checking and plotting the Economic entities in the United States**</u>
 
 ```{r eval=FALSE}
 # Coorelation between all economic aspect columns which proves the basic income and expenditure in a household.
@@ -1635,7 +1722,7 @@ corrplot(M, method = "number",col=brewer.pal(n=8, name="PuOr"))
 ```
 
 
-**Code-10 : Predict the Value of the House by the Number of Rooms Available**
+<u>**Code-10 : Predict the Value of the House by the Number of Rooms Available**</u>
 
 ```{r eval=FALSE}
 library(moments)
@@ -1714,7 +1801,7 @@ ggplot(lm.method.predict.test.metrics, aes(RMSP, valueofhouse)) +
 ```
 
 
-**Code-11 : Does House Income depicts the standard of Living in the United States**
+<u>**Code-11 : Does House Income depicts the standard of Living in the United States**</u>
 
 ```{r eval=FALSE}
 require(ggpubr)
@@ -1744,7 +1831,7 @@ ggscatter(income.house.data.df1, x = "AdjustedHousehold_Inc", y = "ACR",
 ```
 
 
-**Code-12 : How much Americans Care About Their Houses.**
+<u>**Code-12 : How much Americans Care About Their Houses.**</u>
 
 ```{r eval=FALSE}
 library(ggdark)
@@ -1790,7 +1877,7 @@ theme(axis.title.x = element_blank(),axis.text.y=element_text(size=rel(0.8)))  +
 ```
 
 
-**Code-13 : Value of Houses based On their Construction Year**
+<u>**Code-13 : Value of Houses based On their Construction Year**</u>
 
 ```{r eval=FALSE}
 library(ggplot2)
@@ -1838,7 +1925,7 @@ ggplot(avg.price.yearwise, aes(x=`YBL`, y=mean.value , label = "")) +
 ```
 
 
-**Code-14 : Linguistic Demographics versus Year of living**
+<u>**Code-14 : Linguistic Demographics versus Year of living**</u>
 
 ```{r eval=FALSE}
 library(ggplot2)
@@ -1867,7 +1954,7 @@ ggplot() + geom_point(data = move.data, aes(x = MV, y = count.values, size = 5, 
 ```
 
 
-**Code-15 : Predicting the value of the house by family Income Using Support Vector Machine**
+<u>**Code-15 : Predicting the value of the house by family Income Using Support Vector Machine**</u>
 
 ```{r eval=FALSE}
 library(caret)
@@ -1911,7 +1998,7 @@ test_pred
 ```
 
 
-**Code-16 : State Wise - Number of Workers Present in a House (Dynamic Graph)**
+<u>**Code-16 : State Wise - Number of Workers Present in a House (Dynamic Graph)**</u>
 
 ```{r eval=FALSE}
 library(dplyr)
@@ -2000,7 +2087,7 @@ ploting
 ```
 
 
-**Code-17 : Finding the Relationship between Number of Workers in a House and the Vehciles they Own**
+<u>**Code-17 : Finding the Relationship between Number of Workers in a House and the Vehciles they Own**</u>
 
 ```{r eval=FALSE}
 # relationship bw workers in the family and monthly rent
@@ -2026,7 +2113,7 @@ lwd = 2)
 ```
 
 
-**Code-18 : Compare the mean of the Gross Rent to the Standard Rent**
+<u>**Code-18 : Compare the mean of the Gross Rent to the Standard Rent**</u>
 
 ```{r eval=FALSE}
 library(dplyr)
@@ -2055,4 +2142,89 @@ ks.test(gross.rent$GRNTP , y = 'pnorm',mean = 1070.964 , sd = 612.037)
  # performig the one sample T- test here.
 t.test(gross.rent$GRNTP, mu = 1012)
 ```
+
+<u>**Code-19 : Neural Network - Predicting the Value of the Property by Corresponding relative Predictors**</u>
+
+```{r eval=FALSE}
+
+library(neuralnet)
+library(dplyr)
+library(devtools)
+source_url('https://gist.githubusercontent.com/fawda123/7471137/raw/466c1474d0a505ff044412703516c34f1a4684a5/nnet_plot_update.r')
+
+nndata<- mainData %>% select(INSP,FINCP,FULP,GASP,VALP) %>% filter(FINCP != "NA" , INSP != "NA",FULP != "NA",GASP != "NA") %>% na.omit(nndata)
+
+nndata <- head(nndata,1000)
+
+# Random sampling
+samplesizedata = 0.60 * nrow(nndata)
+set.seed(80)
+indexdatann = sample( seq_len ( nrow ( nndata ) ), size = samplesizedata )
+
+# Create training and test set
+datatrain = nndata[ indexdatann, ]
+datatest = nndata[ -indexdatann, ]
+
+
+
+## Scale data for neural network
+
+maxnn = apply(nndata , 2 , max)
+minnn = apply(nndata, 2 , min)
+scaled = as.data.frame(scale(nndata, center = minnn, scale = maxnn - minnn))
+
+trainNN = scaled[indexdatann , ]
+testNN = scaled[-indexdatann , ]
+
+
+set.seed(4)
+NN = neuralnet(VALP ~ INSP + FINCP + FULP + GASP , trainNN, hidden = 3 , linear.output = T )
+
+plot(NN , col.out = 'blue' , fontsize = 9,col.out.synapse = "red",col.intercept = "blue" , col.entry = 'skyblue',col.entry.synapse = 'red' , rep= "best")
+
+```
+
+
+
+## <u>Package Information/Installation</u>
+
+In order to perform the actual analysis and to create fancy graphs and tables I have used couple of new packages which are already not pre-defined and needs installation in most of the cases.
+
+Please note that , All the packages I have used over here can easily be installed by one single command.
+
+> <center><span style="color:Blue"> **install.packages("package name")** </span></center>
+
+
+Following are the packages you need to install:-
+
+* 1. data.table
+* 2. Knitr
+* 3. pandar
+* 4. skim
+* 5. data.table
+* 6. hrbrthemes
+* 7. ggdark
+* 8. ggpubr
+* 9. viridis
+* 10. plotly
+* 11. caret
+* 12. Kernlab
+* 12. moments
+* 13. kablextra (assuming that this is pre-installed)
+* 13. Hmisc
+* 13. corrplot
+* 13. ellipse
+* 14. RColorBrewer
+* 15. mapproj
+* 16. readr
+* 17. maptools
+* 18. rgdal
+* 19. gpclib
+* 20. maps
+* 21. Dplyr (assuming that this is pre-installed)
+* 22. Tidyverse (assuming that this is pre-installed)
+* 23. broom
+* 24. ggplot (assuming that this is pre-installed)
+* 25. neuralnet
+
 
